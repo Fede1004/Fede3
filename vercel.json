@@ -1,59 +1,20 @@
 {
   "version": 2,
   "builds": [
-    {
-      "src": "api/upload.js",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "index.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "upload.html",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "styles/style.css",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "script.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "upload.js",
-      "use": "@vercel/static"
-    },
-    {
-      "src": "images/.gitkeep",
-      "use": "@vercel/static"
-    }
+    { "src": "api/upload.js", "use": "@vercel/node" },
+    { "src": "index.html", "use": "@vercel/static" },
+    { "src": "upload.html", "use": "@vercel/static" },
+    { "src": "styles/style.css", "use": "@vercel/static" },
+    { "src": "script.js", "use": "@vercel/static" },
+    { "src": "upload.js", "use": "@vercel/static" },
+    { "src": "images/.gitkeep", "use": "@vercel/static" }
   ],
   "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
-    },
-    {
-      "src": "/",
-      "dest": "/index.html"
-    },
-    {
-      "src": "/upload",
-      "dest": "/upload.html"
-    },
-    {
-      "src": "/styles/(.*)",
-      "dest": "/styles/$1"
-    },
-    {
-      "src": "/scripts/(.*)",
-      "dest": "/scripts/$1"
-    },
-    {
-      "src": "/images/(.*)",
-      "dest": "/images/$1"
-    }
+    { "src": "/api/(.*)", "dest": "/api/$1" },
+    { "src": "/styles/(.*)", "dest": "/styles/$1" },
+    { "src": "/scripts/(.*)", "dest": "/scripts/$1" },
+    { "src": "/images/(.*)", "dest": "/images/$1" },
+    { "src": "/", "dest": "/index.html" },
+    { "src": "/upload", "dest": "/upload.html" }
   ]
 }
