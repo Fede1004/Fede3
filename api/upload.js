@@ -8,6 +8,20 @@ const upload = multer({ dest: 'uploads/' });
 
 app.use(express.json());
 
+// Middleware per controllare se le cartelle esistono e, in caso contrario, crearle
+const checkDirectories = (req, res, next) => {
+    const dirs = [path.join(__dirname, '../images'), path.join(__dirname, '../images/adapted')];
+    dirs.forEach(dir => {
+        if (!fs.existsSync(dir)) {
+            fs.mkdirSync(dir, { recursive: true });
+            console.log(`Cartella creata: ${dir}`);
+        }
+    });
+    next();
+};
+
+app.use(checkDirectories);
+
 // Rotta per caricare le immagini
 app.post('/api/upload', upload.single('image'), (req, res) => {
     const file = req.file;
