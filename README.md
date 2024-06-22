@@ -11,3 +11,35 @@ Questo progetto è un sito web che consente agli utenti di caricare foto di appa
 
 ## Struttura del Progetto
 
+Fede3/
+│
+├── api/
+│ └── upload.js
+│
+├── images/
+│ └── .gitkeep
+│
+├── styles/
+│ └── style.css
+│
+├── index.html
+├── upload.html
+├── script.js
+├── upload.js
+├── vercel.json
+└── README.md
+
+
+## Requisiti
+
+- Un account GitHub
+- Un account Vercel
+- Una API key di OpenAI
+
+## Installazione
+
+1. Clona il repository:
+
+   ```sh
+   git clone https://github.com/tuo-username/Fede3.git
+   cd Fede3
