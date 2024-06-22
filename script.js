@@ -1,15 +1,16 @@
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', async function() {
     const gallery = document.getElementById('gallery');
     const modifyButton = document.getElementById('modify-button');
     const prompt = document.getElementById('prompt');
     const output = document.getElementById('output');
 
-    // Carica le foto dagli appartamenti
-    const images = ['images/apartment1.jpg', 'images/apartment2.jpg']; // Aggiungi altre immagini qui
+    // Carica le foto dal server
+    const response = await fetch('/api/images');
+    const images = await response.json();
 
     images.forEach(src => {
         const img = document.createElement('img');
-        img.src = src;
+        img.src = `/images/${src}`;
         img.alt = "Foto dell'appartamento";
         gallery.appendChild(img);
     });
