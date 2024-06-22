@@ -14,9 +14,8 @@ document.getElementById('upload-button').addEventListener('click', async () => {
 
     for (let file of files) {
         try {
-            const image = await resizeImage(file, 1024, 1024);
             const formData = new FormData();
-            formData.append('image', image, file.name);
+            formData.append('image', file);
 
             const response = await fetch('/api/upload', {
                 method: 'POST',
@@ -32,7 +31,7 @@ document.getElementById('upload-button').addEventListener('click', async () => {
             console.log(result.message);
 
             const img = document.createElement('img');
-            img.src = URL.createObjectURL(image);
+            img.src = URL.createObjectURL(file);
             img.alt = "Foto dell'appartamento";
             gallery.appendChild(img);
 
@@ -43,43 +42,3 @@ document.getElementById('upload-button').addEventListener('click', async () => {
         }
     }
 });
-
-function resizeImage(file, maxWidth, maxHeight) {
-    return new Promise((resolve, reject) => {
-        const img = document.createElement('img');
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-
-        img.onload = () => {
-            const width = img.width;
-            const height = img.height;
-
-            if (width > height) {
-                if (width > maxWidth) {
-                    img.height *= maxWidth / width;
-                    img.width = maxWidth;
-                }
-            } else {
-                if (height > maxHeight) {
-                    img.width *= maxHeight / height;
-                    img.height = maxHeight;
-                }
-            }
-
-            canvas.width = maxWidth;
-            canvas.height = maxHeight;
-            ctx.fillStyle = "rgba(0, 0, 0, 0)";
-            ctx.fillRect(0, 0, maxWidth, maxHeight);
-            ctx.drawImage(img, (maxWidth - img.width) / 2, (maxHeight - img.height) / 2, img.width, img.height);
-
-            canvas.toBlob((blob) => {
-                resolve(new File([blob], file.name, {
-                    type: file.type,
-                    lastModified: Date.now()
-                }));
-            }, file.type);
-        };
-        img.onerror = reject;
-        img.src = URL.createObjectURL(file);
-    });
-}
