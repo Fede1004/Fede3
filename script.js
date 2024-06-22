@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             gallery.appendChild(img);
         });
     } catch (error) {
-        console.error(error);
+        console.error('Errore durante il caricamento delle immagini:', error);
         alert('Errore nel caricamento delle immagini. Controlla i log per maggiori dettagli.');
     }
 
@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async function() {
                 modifiedImg.alt = "Foto modificata";
                 output.appendChild(modifiedImg);
             } catch (error) {
-                console.error(error);
+                console.error('Errore durante la modifica della foto:', error);
                 alert('Errore nella modifica della foto. Controlla i log per maggiori dettagli.');
             }
         } else {
