@@ -24,7 +24,8 @@ document.getElementById('upload-button').addEventListener('click', async () => {
             });
 
             if (!response.ok) {
-                throw new Error(`Errore nel caricamento delle foto: ${response.statusText}`);
+                const errorData = await response.json();
+                throw new Error(`Errore nel caricamento delle foto: ${errorData.error}`);
             }
 
             const result = await response.json();
@@ -38,7 +39,7 @@ document.getElementById('upload-button').addEventListener('click', async () => {
             alert('Foto caricate con successo!');
         } catch (error) {
             console.error(error);
-            alert('Errore durante il caricamento delle foto. Controlla i log per maggiori dettagli.');
+            alert(`Errore durante il caricamento delle foto. Controlla i log per maggiori dettagli. Errore: ${error.message}`);
         }
     }
 });
