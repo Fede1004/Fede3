@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         if (userPrompt && selectedImage) {
             try {
-                const modifiedImageSrc = await createImageVariation(selectedImage.src);
+                const modifiedImageSrc = await createImageVariation(selectedImage.src, userPrompt);
                 const modifiedImg = document.createElement('img');
                 modifiedImg.src = modifiedImageSrc;
                 modifiedImg.alt = "Foto modificata";
@@ -41,10 +41,11 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
-    async function createImageVariation(imageSrc) {
+    async function createImageVariation(imageSrc, prompt) {
         const apiKey = process.env.OPENAI_API_KEY;
         const formData = new FormData();
         formData.append('image', imageSrc);
+        formData.append('prompt', prompt);
         formData.append('n', '1');
         formData.append('size', '1024x1024');
 
