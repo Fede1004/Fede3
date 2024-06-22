@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
         if (userPrompt && selectedImage) {
             try {
-                const modifiedImageSrc = await modifyImage(selectedImage.src, userPrompt);
+                const modifiedImageSrc = await createImageVariation(selectedImage.src);
                 const modifiedImg = document.createElement('img');
                 modifiedImg.src = modifiedImageSrc;
                 modifiedImg.alt = "Foto modificata";
@@ -41,25 +41,27 @@ document.addEventListener('DOMContentLoaded', async function() {
         }
     });
 
-    async function modifyImage(imageSrc, prompt) {
+    async function createImageVariation(imageSrc) {
         const apiKey = process.env.OPENAI_API_KEY;
-        const response = await fetch('https://api.openai.com/v1/images:edit', {
+        const formData = new FormData();
+        formData.append('image', imageSrc);
+        formData.append('n', '1');
+        formData.append('size', '1024x1024');
+
+        const response = await fetch('/api/variations', {
             method: 'POST',
             headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
+                'Authorization': `Bearer ${apiKey}`
             },
-            body: JSON.stringify({
-                image: imageSrc,
-                prompt: prompt
-            })
+            body: formData
         });
 
         if (!response.ok) {
-            throw new Error(`Errore nella chiamata all'API di OpenAI: ${response.statusText}`);
+            const errorData = await response.json();
+            throw new Error(`Errore nella creazione della variazione: ${errorData.error}`);
         }
 
         const result = await response.json();
-        return result.data.url;
+        return result.data[0].url;
     }
 });
