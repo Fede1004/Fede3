@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     // Funzione per chiamare l'API di OpenAI
     async function modifyImage(imageSrc, prompt) {
-        const apiKey = 'YOUR_OPENAI_API_KEY';
+        const apiKey = process.env.OPENAI_API_KEY;
         const response = await fetch('https://api.openai.com/v1/images:edit', {
             method: 'POST',
             headers: {
