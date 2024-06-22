@@ -11,14 +11,20 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
     const targetPath = path.join(__dirname, '../images', file.originalname);
 
     fs.rename(tempPath, targetPath, err => {
-        if (err) return res.status(500).json({ message: 'Errore durante il caricamento delle foto' });
+        if (err) {
+            console.error(`Errore durante il caricamento delle foto: ${err}`);
+            return res.status(500).json({ message: 'Errore durante il caricamento delle foto' });
+        }
         res.status(200).json({ message: 'Foto caricate con successo!' });
     });
 });
 
 app.get('/api/images', (req, res) => {
     fs.readdir(path.join(__dirname, '../images'), (err, files) => {
-        if (err) return res.status(500).json({ message: 'Errore durante il recupero delle immagini' });
+        if (err) {
+            console.error(`Errore durante il recupero delle immagini: ${err}`);
+            return res.status(500).json({ message: 'Errore durante il recupero delle immagini' });
+        }
         res.status(200).json(files);
     });
 });
