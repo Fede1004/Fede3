@@ -34,9 +34,10 @@ app.post('/api/upload', upload.single('image'), async (req, res) => {
 });
 
 app.get('/api/images', (req, res) => {
-    fs.readdir(path.join(__dirname, '../images'), (err, files) => {
+    const imagesDir = path.join(__dirname, '../images');
+    fs.readdir(imagesDir, (err, files) => {
         if (err) {
-            console.error(`Errore durante il recupero delle immagini: ${err.message}`);
+            console.error(`Errore durante il recupero delle immagini dalla directory ${imagesDir}: ${err.message}`);
             return res.status(500).json({ message: 'Errore durante il recupero delle immagini', error: err.message });
         }
         console.log(`Immagini recuperate con successo: ${files}`);
