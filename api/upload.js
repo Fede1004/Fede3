@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
-const fetch = require('node-fetch'); // Assicurati di avere node-fetch installato
+const fetch = require('node-fetch');
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
