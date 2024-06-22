@@ -4,22 +4,33 @@ const path = require('path');
 const fs = require('fs');
 const fetch = require('node-fetch');
 const FormData = require('form-data');
+const sharp = require('sharp');
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
-app.post('/api/upload', upload.single('image'), (req, res) => {
+app.post('/api/upload', upload.single('image'), async (req, res) => {
     const file = req.file;
     const tempPath = file.path;
     const targetPath = path.join(__dirname, '../images', file.originalname);
 
-    fs.rename(tempPath, targetPath, err => {
-        if (err) {
-            console.error(`Errore durante il caricamento delle foto: ${err.message}`);
-            return res.status(500).json({ message: 'Errore durante il caricamento delle foto', error: err.message });
-        }
-        console.log(`Foto caricata con successo: ${file.originalname}`);
+    try {
+        // Converti l'immagine in PNG, ridimensiona e imposta a 1024x1024 se necessario
+        await sharp(tempPath)
+            .resize(1024, 1024, {
+                fit: sharp.fit.inside,
+                withoutEnlargement: true
+            })
+            .toFormat('png')
+            .toFile(targetPath);
+
+        fs.unlinkSync(tempPath); // Rimuovi il file temporaneo
+
+        console.log(`Foto caricata e convertita con successo: ${file.originalname}`);
         res.status(200).json({ message: 'Foto caricate con successo!' });
-    });
+    } catch (err) {
+        console.error(`Errore durante la conversione delle foto: ${err.message}`);
+        res.status(500).json({ message: 'Errore durante la conversione delle foto', error: err.message });
+    }
 });
 
 app.get('/api/images', (req, res) => {
@@ -45,7 +56,7 @@ app.post('/api/variations', upload.single('image'), async (req, res) => {
         const formData = new FormData();
         formData.append('image', fs.createReadStream(file.path));
         formData.append('n', req.body.n || '1');
-        formData.append('size', req.body.size || '1024x1024');
+        formData.append('size', '1024x1024');
 
         const response = await fetch('https://api.openai.com/v1/images/variations', {
             method: 'POST',
@@ -56,7 +67,7 @@ app.post('/api/variations', upload.single('image'), async (req, res) => {
         });
 
         const responseText = await response.text();
-        console.log(`Risposta API: ${responseText}`);
+        console.log(`Risposta API: ${responseText}`); // Log della risposta completa
 
         try {
             const result = JSON.parse(responseText);
