@@ -44,18 +44,19 @@ app.get('/api/images', (req, res) => {
     });
 });
 
-app.post('/api/variations', upload.single('image'), async (req, res) => {
+app.post('/api/variations', async (req, res) => {
     const apiKey = process.env.OPENAI_API_KEY;
-    const file = req.file;
+    const { imagePath, prompt } = req.body;
 
-    if (!file) {
-        return res.status(400).json({ message: 'Nessun file immagine caricato.' });
+    if (!imagePath || !prompt) {
+        return res.status(400).json({ message: 'Immagine o prompt mancante.' });
     }
 
     try {
         const formData = new FormData();
-        formData.append('image', fs.createReadStream(file.path));
-        formData.append('n', req.body.n || '1');
+        formData.append('image', fs.createReadStream(path.join(__dirname, '../images', imagePath)));
+        formData.append('prompt', prompt);
+        formData.append('n', '1');
         formData.append('size', '1024x1024');
 
         const response = await fetch('https://api.openai.com/v1/images/variations', {
@@ -67,8 +68,9 @@ app.post('/api/variations', upload.single('image'), async (req, res) => {
         });
 
         const responseText = await response.text();
-        console.log(`Risposta API: ${responseText}`); // Log della risposta completa
+        console.log(`Risposta API: ${responseText}`);
 
+        // Prova a fare il parsing della risposta come JSON
         try {
             const result = JSON.parse(responseText);
 
