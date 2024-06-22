@@ -15,6 +15,7 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
             console.error(`Errore durante il caricamento delle foto: ${err}`);
             return res.status(500).json({ message: 'Errore durante il caricamento delle foto' });
         }
+        console.log(`Foto caricata con successo: ${file.originalname}`);
         res.status(200).json({ message: 'Foto caricate con successo!' });
     });
 });
@@ -25,6 +26,7 @@ app.get('/api/images', (req, res) => {
             console.error(`Errore durante il recupero delle immagini: ${err}`);
             return res.status(500).json({ message: 'Errore durante il recupero delle immagini' });
         }
+        console.log(`Immagini recuperate con successo: ${files}`);
         res.status(200).json(files);
     });
 });
