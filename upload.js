@@ -13,16 +13,22 @@ document.getElementById('upload-button').addEventListener('click', async () => {
     const gallery = document.getElementById('gallery');
 
     for (let file of files) {
-        const image = await resizeImage(file, 1024, 1024);
-        const formData = new FormData();
-        formData.append('image', image, file.name);
-
         try {
+            const image = await resizeImage(file, 1024, 1024);
+            const formData = new FormData();
+            formData.append('image', image, file.name);
+
             const response = await fetch('/api/upload', {
                 method: 'POST',
                 body: formData
             });
+
+            if (!response.ok) {
+                throw new Error(`Errore nel caricamento delle foto: ${response.statusText}`);
+            }
+
             const result = await response.json();
+            console.log(result.message);
 
             const img = document.createElement('img');
             img.src = URL.createObjectURL(image);
@@ -31,7 +37,8 @@ document.getElementById('upload-button').addEventListener('click', async () => {
 
             alert('Foto caricate con successo!');
         } catch (error) {
-            console.error('Errore durante il caricamento delle foto:', error);
+            console.error(error);
+            alert('Errore durante il caricamento delle foto. Controlla i log per maggiori dettagli.');
         }
     }
 });
