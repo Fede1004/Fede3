@@ -26,6 +26,7 @@ app.post('/api/upload', upload.single('image'), (req, res) => {
 // Rotta per ottenere le immagini caricate
 app.get('/api/images', (req, res) => {
     const imagesDir = path.join(__dirname, '../images');
+    console.log(`Tentativo di leggere la directory delle immagini: ${imagesDir}`);
     fs.readdir(imagesDir, (err, files) => {
         if (err) {
             console.error(`Errore durante il recupero delle immagini dalla directory ${imagesDir}: ${err.message}`);
