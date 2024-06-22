@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const fetch = require('node-fetch');
+const FormData = require('form-data');
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
@@ -41,25 +42,34 @@ app.post('/api/variations', upload.single('image'), async (req, res) => {
     }
 
     try {
+        const formData = new FormData();
+        formData.append('image', fs.createReadStream(file.path));
+        formData.append('n', req.body.n || '1');
+        formData.append('size', req.body.size || '1024x1024');
+
         const response = await fetch('https://api.openai.com/v1/images/variations', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${apiKey}`
             },
-            body: new URLSearchParams({
-                'image': fs.createReadStream(file.path),
-                'n': req.body.n || '1',
-                'size': req.body.size || '1024x1024'
-            })
+            body: formData
         });
 
-        const result = await response.json();
+        const responseText = await response.text();
+        console.log(`Risposta API: ${responseText}`);
 
-        if (!response.ok) {
-            throw new Error(result.error.message);
+        try {
+            const result = JSON.parse(responseText);
+
+            if (!response.ok) {
+                throw new Error(result.error.message);
+            }
+
+            res.status(200).json(result);
+        } catch (parseError) {
+            console.error(`Errore durante il parsing della risposta: ${parseError.message}`);
+            res.status(500).json({ message: 'Errore durante il parsing della risposta', error: parseError.message, response: responseText });
         }
-
-        res.status(200).json(result);
     } catch (error) {
         console.error(`Errore durante la creazione delle variazioni: ${error.message}`);
         res.status(500).json({ message: 'Errore durante la creazione delle variazioni', error: error.message });
