@@ -6,36 +6,24 @@ const sharp = require('sharp');
 const app = express();
 const upload = multer({ dest: 'uploads/' });
 
-// Middleware per gestire le richieste JSON
 app.use(express.json());
 
 // Rotta per caricare le immagini
-app.post('/api/upload', upload.single('image'), async (req, res) => {
+app.post('/api/upload', upload.single('image'), (req, res) => {
     const file = req.file;
-    const tempPath = file.path;
-    const targetPath = path.join(__dirname, '../images', `${file.filename}.png`);
+    const targetPath = path.join(__dirname, '../images', file.originalname);
 
-    try {
-        // Converti l'immagine in PNG, ridimensiona e imposta a 1024x1024 se necessario
-        await sharp(tempPath)
-            .resize(1024, 1024, {
-                fit: sharp.fit.inside,
-                withoutEnlargement: true
-            })
-            .toFormat('png')
-            .toFile(targetPath);
-
-        fs.unlinkSync(tempPath); // Rimuovi il file temporaneo
-
-        console.log(`Foto caricata e convertita con successo: ${file.filename}.png`);
+    fs.rename(file.path, targetPath, err => {
+        if (err) {
+            console.error(`Errore durante il caricamento delle foto: ${err.message}`);
+            return res.status(500).json({ message: 'Errore durante il caricamento delle foto', error: err.message });
+        }
+        console.log(`Foto caricata con successo: ${file.originalname}`);
         res.status(200).json({ message: 'Foto caricate con successo!' });
-    } catch (err) {
-        console.error(`Errore durante la conversione delle foto: ${err.message}`);
-        res.status(500).json({ message: 'Errore durante la conversione delle foto', error: err.message });
-    }
+    });
 });
 
-// Rotta per ottenere le immagini
+// Rotta per ottenere le immagini caricate
 app.get('/api/images', (req, res) => {
     const imagesDir = path.join(__dirname, '../images');
     fs.readdir(imagesDir, (err, files) => {
@@ -46,6 +34,30 @@ app.get('/api/images', (req, res) => {
         console.log(`Immagini recuperate con successo: ${files}`);
         res.status(200).json(files);
     });
+});
+
+// Rotta per adattare l'immagine per OpenAI
+app.post('/api/adapt', async (req, res) => {
+    const { imageName } = req.body;
+    const imagePath = path.join(__dirname, '../images', imageName);
+    const adaptedImagePath = path.join(__dirname, '../images/adapted', imageName);
+
+    try {
+        await sharp(imagePath)
+            .resize(1024, 1024, {
+                fit: sharp.fit.inside,
+                withoutEnlargement: true
+            })
+            .toFormat('png')
+            .ensureAlpha()
+            .toFile(adaptedImagePath);
+
+        console.log(`Immagine adattata con successo: ${imageName}`);
+        res.status(200).json({ message: 'Immagine adattata con successo!', adaptedImage: `/images/adapted/${imageName}` });
+    } catch (err) {
+        console.error(`Errore durante l'adattamento dell'immagine: ${err.message}`);
+        res.status(500).json({ message: 'Errore durante l'adattamento dell'immagine', error: err.message });
+    }
 });
 
 module.exports = app;
