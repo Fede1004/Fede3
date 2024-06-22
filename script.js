@@ -16,6 +16,7 @@ document.addEventListener('DOMContentLoaded', async function() {
             const img = document.createElement('img');
             img.src = `/images/${src}`;
             img.alt = "Foto dell'appartamento";
+            img.addEventListener('click', () => selectImage(src));
             gallery.appendChild(img);
         });
     } catch (error) {
@@ -25,11 +26,12 @@ document.addEventListener('DOMContentLoaded', async function() {
 
     modifyButton.addEventListener('click', async () => {
         const userPrompt = prompt.value;
-        const selectedImage = document.querySelector('#gallery img'); // Per esempio, seleziona la prima immagine
+        const selectedImage = document.querySelector('#gallery img.selected'); // Seleziona l'immagine con la classe "selected"
 
         if (userPrompt && selectedImage) {
             try {
-                const modifiedImageSrc = await createImageVariation(selectedImage.src, userPrompt);
+                const adaptedImage = await adaptImage(selectedImage.src);
+                const modifiedImageSrc = await createImageVariation(adaptedImage, userPrompt);
                 const modifiedImg = document.createElement('img');
                 modifiedImg.src = modifiedImageSrc;
                 modifiedImg.alt = "Foto modificata";
@@ -38,8 +40,35 @@ document.addEventListener('DOMContentLoaded', async function() {
                 console.error(error);
                 alert('Errore nella modifica della foto. Controlla i log per maggiori dettagli.');
             }
+        } else {
+            alert('Seleziona un\'immagine e inserisci un prompt.');
         }
     });
+
+    async function selectImage(src) {
+        const images = document.querySelectorAll('#gallery img');
+        images.forEach(img => img.classList.remove('selected'));
+        const selectedImg = document.querySelector(`#gallery img[src='${src}']`);
+        selectedImg.classList.add('selected');
+    }
+
+    async function adaptImage(imageSrc) {
+        const imageName = imageSrc.split('/').pop();
+        const response = await fetch('/api/adapt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ imageName })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Errore nell'adattamento dell'immagine: ${response.statusText}`);
+        }
+
+        const result = await response.json();
+        return result.adaptedImage;
+    }
 
     async function createImageVariation(imageSrc, prompt) {
         const apiKey = process.env.OPENAI_API_KEY;
