@@ -1,5 +1,5 @@
 {
-  "name": "fede3",
+  "name": "photo-modification-website",
   "version": "1.0.0",
   "description": "Sito web per modificare le foto degli appartamenti utilizzando OpenAI",
   "main": "api/upload.js",
@@ -9,8 +9,8 @@
   "dependencies": {
     "express": "^4.17.1",
     "multer": "^1.4.3",
-    "node-fetch": "^2.6.1",
     "sharp": "^0.29.3",
+    "node-fetch": "^2.6.1",
     "form-data": "^4.0.0"
   }
 }
